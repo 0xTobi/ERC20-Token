@@ -19,21 +19,21 @@ contract OurTokenTest is Test {
     // transferFrom() requires the from address to be set manually.
 
     function setUp() public {
-       deployer = new DeployOurToken();
-       ourToken = deployer.run();
+        deployer = new DeployOurToken();
+        ourToken = deployer.run();
 
-       vm.prank(msg.sender); // The owner of the token should be the deployer.
-       ourToken.transfer(bob, STARTING_BALANCE);
+        vm.prank(msg.sender); // The owner of the token should be the deployer.
+        ourToken.transfer(bob, STARTING_BALANCE);
     }
 
-        /* TESTS */
+    /* TESTS */
 
-// Test Bob's balance after initialization
+    // Test Bob's balance after initialization
     function testBobBalance() public view {
         assertEq(STARTING_BALANCE, ourToken.balanceOf(bob));
     }
 
-  // Test allowances and transferFrom
+    // Test allowances and transferFrom
     function testAllowancesWorks() public {
         // Authorize permission and set allowance
         // Authorized transfer .abi
@@ -43,7 +43,7 @@ contract OurTokenTest is Test {
 
         // Bob approves alice to spend some amount of his token.
         vm.prank(bob);
-        ourToken.approve(alice, initialAllowance); 
+        ourToken.approve(alice, initialAllowance);
 
         assertEq(ourToken.allowance(bob, alice), initialAllowance); // Check allowance
 
@@ -76,7 +76,7 @@ contract OurTokenTest is Test {
         ourToken.transfer(alice, transferAmount);
     }
 
-     // Test approve and allowance functionality
+    // Test approve and allowance functionality
     function testApprove() public {
         uint256 allowanceAmount = 100 ether;
 
@@ -86,7 +86,6 @@ contract OurTokenTest is Test {
 
         assertEq(ourToken.allowance(bob, alice), allowanceAmount);
     }
-
 
     // Test that approve can overwrite an existing allowance
     function testApproveOverwritesExistingAllowance() public {
@@ -104,7 +103,7 @@ contract OurTokenTest is Test {
         assertEq(ourToken.allowance(bob, alice), newAllowance);
     }
 
-        // Test transferFrom reverts if not enough allowance
+    // Test transferFrom reverts if not enough allowance
     function testTransferFromRevertsIfNotEnoughAllowance() public {
         uint256 initialAllowance = 50 ether;
         uint256 transferAmount = 60 ether; // More than allowance
@@ -119,19 +118,12 @@ contract OurTokenTest is Test {
         ourToken.transferFrom(bob, alice, transferAmount);
     }
 
-        // Test that total supply is consistent
+    // Test that total supply is consistent
     function testTotalSupplyConsistency() public view {
         uint256 totalSupply = ourToken.totalSupply();
-        uint256 totalBalances = ourToken.balanceOf(msg.sender) +
-            ourToken.balanceOf(bob) +
-            ourToken.balanceOf(alice) +
-            ourToken.balanceOf(carol);
+        uint256 totalBalances = ourToken.balanceOf(msg.sender) + ourToken.balanceOf(bob) + ourToken.balanceOf(alice)
+            + ourToken.balanceOf(carol);
 
         assertEq(totalSupply, totalBalances);
     }
-
-    
-} 
-
-
-
+}
