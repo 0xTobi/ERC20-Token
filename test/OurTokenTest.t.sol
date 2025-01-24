@@ -72,7 +72,11 @@ contract OurTokenTest is Test {
         uint256 transferAmount = STARTING_BALANCE + 1 ether; // More than Bob's balance
 
         vm.prank(bob);
-        vm.expectRevert("ERC20: transfer amount exceeds balance");
+        vm.expectRevert(
+            abi.encodeWithSignature(
+                "ERC20InsufficientBalance(address,uint256,uint256)", bob, STARTING_BALANCE, transferAmount
+            )
+        );
         ourToken.transfer(alice, transferAmount);
     }
 
@@ -114,7 +118,11 @@ contract OurTokenTest is Test {
 
         // Alice tries to transfer more than allowance
         vm.prank(alice);
-        vm.expectRevert("ERC20: insufficient allowance");
+        vm.expectRevert(
+            abi.encodeWithSignature(
+                "ERC20InsufficientAllowance(address,uint256,uint256)", alice, initialAllowance, transferAmount
+            )
+        );
         ourToken.transferFrom(bob, alice, transferAmount);
     }
 
@@ -125,5 +133,53 @@ contract OurTokenTest is Test {
             + ourToken.balanceOf(carol);
 
         assertEq(totalSupply, totalBalances);
+    }
+
+    // Test that approve emits an Approval event
+    // function testApproveEmitsEvent() public {
+    //     uint256 allowanceAmount = 100 ether;
+
+    //     vm.prank(bob);
+    //     vm.expectEmit(true, true, false, true);
+    //     emit Approval(bob, alice, allowanceAmount);
+    //     ourToken.approve(alice, allowanceAmount);
+    // }
+
+    // Test transfer emits a Transfer event
+    // function testTransferEmitsEvent() public {
+    //     uint256 transferAmount = 50 ether;
+
+    //     vm.prank(bob);
+    //     vm.expectEmit(true, true, false, true);
+    //     emit Transfer(bob, alice, transferAmount);
+    //     ourToken.transfer(alice, transferAmount);
+    // }
+
+    // Test transferFrom emits a Transfer event
+    // function testTransferFromEmitsEvent() public {
+    //     uint256 initialAllowance = 100 ether;
+    //     uint256 transferAmount = 20 ether;
+
+    //     // Bob approves Alice
+    //     vm.prank(bob);
+    //     ourToken.approve(alice, initialAllowance);
+
+    //     // Alice transfers tokens
+    //     vm.prank(alice);
+    //     vm.expectEmit(true, true, false, true);
+    //     emit Transfer(bob, alice, transferAmount);
+    //     ourToken.transferFrom(bob, alice, transferAmount);
+    // }
+
+    // Test balance consistency when transferring small amounts
+    function testSmallTransfers() public {
+        uint256 smallTransfer = 1 ether;
+
+        // Bob transfers a small amount to Alice
+        vm.prank(bob);
+        ourToken.transfer(alice, smallTransfer);
+
+        assertEq(ourToken.balanceOf(bob), STARTING_BALANCE - smallTransfer);
+        assertEq(ourToken.balanceOf(alice), smallTransfer);
     }
 }
