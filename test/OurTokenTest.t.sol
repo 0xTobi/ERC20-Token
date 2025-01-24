@@ -164,12 +164,12 @@ contract OurTokenTest is Test {
     //     vm.prank(bob);
     //     ourToken.approve(alice, initialAllowance);
 
-    //     // Alice transfers tokens
-    //     vm.prank(alice);
-    //     vm.expectEmit(true, true, false, true);
-    //     emit Transfer(bob, alice, transferAmount);
-    //     ourToken.transferFrom(bob, alice, transferAmount);
-    // }
+        // Alice transfers tokens
+        vm.prank(alice);
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(bob, alice, transferAmount);
+        ourToken.transferFrom(bob, alice, transferAmount);
+    }
 
     // Test balance consistency when transferring small amounts
     function testSmallTransfers() public {
