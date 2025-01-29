@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {Test} from "forge-std/Test.sol";
+import {Test, console} from "forge-std/Test.sol";
 import {OurToken} from "../src/OurToken.sol";
 import {DeployOurToken} from "../script/DeployOurToken.s.sol";
 
@@ -107,6 +107,22 @@ contract OurTokenTest is Test {
         assertEq(ourToken.allowance(bob, alice), newAllowance);
     }
 
+    function testTransferFrom() public {
+        uint256 initialAllowance = 100;
+        uint256 transferAmount = 20;
+
+        // Bob approves Alice
+        vm.prank(bob);
+        ourToken.approve(alice, initialAllowance);
+
+        // Alice transfers
+        vm.prank(alice);
+        ourToken.transferFrom(bob, alice, transferAmount);
+
+        assertEq(ourToken.balanceOf(bob), STARTING_BALANCE - transferAmount);
+        assertEq(ourToken.balanceOf(alice), transferAmount);
+    }
+
     // Test transferFrom reverts if not enough allowance
     function testTransferFromRevertsIfNotEnoughAllowance() public {
         uint256 initialAllowance = 50 ether;
@@ -164,12 +180,12 @@ contract OurTokenTest is Test {
     //     vm.prank(bob);
     //     ourToken.approve(alice, initialAllowance);
 
-        // Alice transfers tokens
-        // vm.prank(alice);
-        // vm.expectEmit(true, true, false, true);
-        // emit Transfer(bob, alice, transferAmount);
-        // ourToken.transferFrom(bob, alice, transferAmount);
-    }
+    //     // Alice transfers tokens
+    //     vm.prank(alice);
+    //     vm.expectEmit(true, true, false, true);
+    //     emit Transfer(bob, alice, transferAmount);
+    //     ourToken.transferFrom(bob, alice, transferAmount);
+    // }
 
     // Test balance consistency when transferring small amounts
     function testSmallTransfers() public {
